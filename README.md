@@ -32,7 +32,7 @@ Unlike traditional middleware, Lumen is **Schema-Agnostic**:
 1. Create a `.env` file with `GROQ_API_KEY=your_key_here`.
 2. Run `pip install -r requirements.txt`
 3. **Start Microservices:** `python services.py` (Runs ports 8001 & 8002).
-4. **Start Agent CLI:** `python main.py`  on a new terminal.
+4. Run `python app.py`, then open `http://localhost:8000` in your browser.
 5. **Example Request:** User ID: `101`, Request: `Give me a full profile with email`.
 
 ---
@@ -65,7 +65,10 @@ Unlike traditional middleware, Lumen is **Schema-Agnostic**:
 5.  **Harmonizer Node:** The LLM maps the raw, messy data into a clean JSON response.
 
 **Architecture Diagram :**
-![alt text](arc.png)
+![alt text](arch.png)
+
+**DataFlow Diagram :**
+![alt text](df.png)
 
 ### 7.3. Scope
 **Hackathon 1 Features:**
@@ -82,7 +85,8 @@ Unlike traditional middleware, Lumen is **Schema-Agnostic**:
 *   **Python 3.10+**
 *   **LangGraph** (Orchestration)
 *   **Groq / Llama 3.1** (Reasoning Engine)
-*   **FastAPI / Uvicorn** (Microservices)
+*   **FastAPI / Uvicorn** (Microservices & Web Gateway)
+*   **Tailwind CSS & JavaScript** (Frontend UI)
 *   **Requests** (Distributed Communication)
 
 Here is the refined, comprehensive documentation for **Project Lumen**. It integrates the technical utility, practical examples, and the specific requirements for your hackathon submission.
@@ -104,7 +108,9 @@ In a real enterprise, schemas change daily.
     `{"badge_info": {"name": "Alice Dev", "dept": "Engineering"}}`
 
 ### Working Screenshot
-![alt text](working_ss.png)
+![alt text](working1.png)
+![alt text](working2.png)
+
 
 
 ### 7.6. Agentic Functionality & Implementation
@@ -136,13 +142,12 @@ Different services return data in different schemas.
 ### 7.7. Individual Contributions :
 
 #### **Contributor 1 (2023101011): Infrastructure & Distributed Networking**
-*   **Microservices Development:** Built and deployed the decoupled **Identity** and **Directory** services using FastAPI on separate network ports.
-*   **Network Tooling:** Developed the `fetcher` node logic to handle distributed HTTP requests, connection timeouts, and service-level error handling.
-*   **Integration & CLI:** Managed the environment configuration (`.env`/`requirements`) and implemented the terminal-based user interface and execution logging.
+*   **Microservices Development:** Built and deployed the decoupled **Identity** and **Directory** services using FastAPI.
+*   **Web Gateway & UI:** Developed the **FastAPI Web Server** and the **Tailwind CSS Dashboard** to visualize the agent's real-time execution trace.
+*   **Network Tooling:** Developed the `fetcher` node logic to handle distributed HTTP requests and connection timeouts.
 
 #### **Contributor 2 (2023101003): AI Orchestration & Logic Architecture**
-*   **Agentic Framework:** Designed the **LangGraph** `StateGraph` structure, including state management (memory) and cyclical orchestration flow.
-*   **Reasoning Logic:** Architected the `investigator` node using **Gap Analysis** to allow the LLM to autonomously decide which distributed service to query.
-*   **Semantic Harmonization:** Engineered the `harmonizer` prompts to perform data mapping and clean JSON formatting across disparate service schemas.
-
+*   **Agentic Framework:** Designed the **LangGraph** `StateGraph` structure, including state management and cyclical orchestration flow.
+*   **Reasoning Logic:** Architected the `investigator` node using **Gap Analysis** for autonomous service selection.
+*   **Semantic Harmonization:** Engineered the `harmonizer` prompts to perform zero-shot data mapping across disparate service schemas.
 

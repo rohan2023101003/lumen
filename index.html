@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lumen | Agentic Middleware</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-8">
+    
+    <header class="mb-12 text-center">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">Project Lumen</h1>
+        <p class="text-slate-400 mt-2 text-sm tracking-widest uppercase">Autonomous Distributed Middleware</p>
+    </header>
+
+    <main class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Input Section -->
+        <section class="glass p-6 rounded-2xl shadow-xl">
+            <h2 class="text-xl font-semibold mb-4 text-blue-300">Agent Command</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1 uppercase">User ID</label>
+                    <input id="userId" type="text" placeholder="e.g. 101" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 focus:outline-none focus:border-blue-500 transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-500 mb-1 uppercase">Prompt</label>
+                    <textarea id="request" placeholder="e.g. Give me a full profile with email" rows="3" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 focus:outline-none focus:border-blue-500 transition-all"></textarea>
+                </div>
+                <button onclick="askLumen()" id="btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-all shadow-lg shadow-blue-900/20">
+                    Execute Agent Loop
+                </button>
+            </div>
+        </section>
+
+        <!-- Status & Flow Section -->
+        <section class="glass p-6 rounded-2xl shadow-xl flex flex-col">
+            <h2 class="text-xl font-semibold mb-4 text-emerald-300">Execution Trace</h2>
+            <div id="status" class="hidden text-sm text-blue-400 mb-4 italic pulse">● Agent is reasoning across distributed nodes...</div>
+            <div id="flow" class="flex flex-col gap-2 overflow-y-auto max-h-48 text-sm">
+                <div class="text-slate-500">Waiting for command...</div>
+            </div>
+        </section>
+
+        <!-- Result Section (Full Width) -->
+        <section class="md:col-span-2 glass p-6 rounded-2xl shadow-xl">
+            <h2 class="text-xl font-semibold mb-4 text-slate-200">Final Harmonized Response</h2>
+            <pre id="output" class="bg-slate-950 p-4 rounded-lg overflow-x-auto text-emerald-400 font-mono text-sm min-h-[100px]">{}</pre>
+        </section>
+    </main>
+
+    <script>
+        async function askLumen() {
+            const userId = document.getElementById('userId').value;
+            const userRequest = document.getElementById('request').value;
+            const btn = document.getElementById('btn');
+            const status = document.getElementById('status');
+            const flowBox = document.getElementById('flow');
+            const outputBox = document.getElementById('output');
+
+            if(!userId || !userRequest) return alert("Please fill all fields");
+
+            // Reset UI
+            btn.disabled = true;
+            status.classList.remove('hidden');
+            flowBox.innerHTML = '';
+            outputBox.innerText = '{}';
+
+            try {
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ user_id: userId, user_request: userRequest })
+                });
+                
+                const data = await response.json();
+
+                // Render Trace
+                data.flow.forEach((step, index) => {
+                    const el = document.createElement('div');
+                    el.className = "flex items-center gap-2 text-slate-300 animate-fade-in";
+                    el.innerHTML = `<span class="text-blue-500 font-bold">#${index+1}</span> <span class="bg-slate-800 px-2 py-1 rounded text-xs border border-slate-700">${step}</span>`;
+                    flowBox.appendChild(el);
+                });
+
+                // Render Final Output
+                outputBox.innerText = data.output;
+            } catch (err) {
+                outputBox.innerText = "Error connecting to Agent Gateway";
+            } finally {
+                btn.disabled = false;
+                status.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
