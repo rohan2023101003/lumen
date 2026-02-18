@@ -103,8 +103,37 @@ In a real enterprise, schemas change daily.
 6.  **Agent Step 5:** Harmonizer merges the distributed data into: 
     `{"badge_info": {"name": "Alice Dev", "dept": "Engineering"}}`
 
+### Working Screenshot
+![alt text](working_ss.png)
 
-### Individual Contributions :
+
+### 7.6. Agentic Functionality & Implementation
+
+What distinguishes Lumen from a standard script is its **Autonomous Reasoning Loop**. Below is the technical breakdown of how this functionality is implemented:
+
+#### A. Perception & Gap Analysis (The Investigator)
+Unlike a hardcoded "If-Else" aggregator, the agent performs a **Semantic Gap Analysis**. 
+*   **How it's implemented:** The `investigator` node receives the current `data_pool` (memory) and the user's natural language `user_request`. 
+*   **The Logic:** It compares the "Current State" (what data we have) against the "Goal State" (what the user wants). It identifies missing fields (e.g., "The user wants an email, but the data pool only has a name").
+
+#### B. Stateful Memory (The LangGraph Backbone)
+A standard API call is stateless. Lumen is **Stateful**.
+*   **How it's implemented:** We utilize a **LangGraph `TypedDict` State**. This acts as the agent's "Short-Term Memory." 
+*   **Persistence:** Every time the `fetcher` node retrieves data from a distributed service, it appends that data to the `data_pool`. The `investigator` then re-examines this pool in the next loop iteration, allowing the agent to "remember" what it has already discovered.
+
+#### C. Autonomous Tool Selection (The Control Loop)
+The agent decides which "Tool" (Internal Service) to invoke without a predefined sequence.
+*   **How it's implemented:** We use **Conditional Edges** in LangGraph. The LLM evaluates the state and returns a specific token (`SERVICE_ID`, `SERVICE_DIR`, or `FINALIZE`). 
+*   **The Switchboard:** LangGraph uses this token to physically route the execution to the corresponding Python function (node). This allows for **Non-Linear Execution**—if the name is already in memory, the agent intelligently skips the Identity Service and jumps straight to the Directory Service.
+
+#### D. Semantic Harmonization
+Different services return data in different schemas.
+*   **How it's implemented:** The `harmonizer` node uses the LLM to perform **Zero-Shot Mapping**. It takes raw JSON from multiple distributed sources and re-maps them into a single, cohesive structure that matches the user's original query intent, effectively acting as an autonomous Data-Translation Layer.
+
+---
+
+
+### 7.7. Individual Contributions :
 
 #### **Contributor 1 (2023101011): Infrastructure & Distributed Networking**
 *   **Microservices Development:** Built and deployed the decoupled **Identity** and **Directory** services using FastAPI on separate network ports.
@@ -115,4 +144,5 @@ In a real enterprise, schemas change daily.
 *   **Agentic Framework:** Designed the **LangGraph** `StateGraph` structure, including state management (memory) and cyclical orchestration flow.
 *   **Reasoning Logic:** Architected the `investigator` node using **Gap Analysis** to allow the LLM to autonomously decide which distributed service to query.
 *   **Semantic Harmonization:** Engineered the `harmonizer` prompts to perform data mapping and clean JSON formatting across disparate service schemas.
-# lumen
+
+
